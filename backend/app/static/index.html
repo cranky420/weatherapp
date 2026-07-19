@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather Platform</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #7dd3fc, #2563eb);
+        color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+
+      .card {
+        width: 90%;
+        max-width: 420px;
+        background: rgba(255, 255, 255, 0.16);
+        backdrop-filter: blur(12px);
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      h1 {
+        text-align: center;
+        margin-top: 0;
+        font-size: 24px;
+      }
+
+      .search-box {
+        display: flex;
+        gap: 10px;
+        margin: 16px 0;
+      }
+
+      input {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+      }
+
+      button {
+        padding: 10px 14px;
+        border: none;
+        border-radius: 8px;
+        background: #111827;
+        color: white;
+        cursor: pointer;
+      }
+
+      .weather-icon {
+        font-size: 48px;
+        text-align: center;
+        margin: 10px 0;
+      }
+
+      .temp {
+        font-size: 42px;
+        font-weight: bold;
+        text-align: center;
+      }
+
+      .subtle {
+        text-align: center;
+        margin: 8px 0 16px;
+        color: #e5e7eb;
+      }
+
+      .details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      .detail {
+        background: rgba(255,255,255,0.15);
+        padding: 10px;
+        border-radius: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Weather Platform</h1>
+
+      <div class="search-box">
+        <input id="cityInput" type="text" placeholder="Enter City" />
+        <button onclick="loadWeather()">Search</button>
+      </div>
+
+      <div class="weather-icon">🌤️</div>
+      <div class="temp" id="temp">31°C</div>
+      <div class="subtle" id="condition">Sunny</div>
+      <div class="subtle" id="feelsLike">Feels like 35°C</div>
+
+      <div class="details">
+        <div class="detail">Humidity: <strong id="humidity">68%</strong></div>
+        <div class="detail">Wind: <strong id="wind">12 km/h</strong></div>
+        <div class="detail">Pressure: <strong id="pressure">1009 hPa</strong></div>
+        <div class="detail">Location: <strong id="location">Kolkata</strong></div>
+      </div>
+    </div>
+
+    <script>
+      async function loadWeather() {
+        const city = document.getElementById('cityInput').value || 'Kolkata';
+        document.getElementById('location').textContent = city;
+
+        try {
+          const response = await fetch(`/weather?city=${encodeURIComponent(city)}`);
+          const data = await response.json();
+
+          document.getElementById('temp').textContent = `${data.temperature}°C`;
+          document.getElementById('condition').textContent = data.condition;
+          document.getElementById('feelsLike').textContent = `Feels like ${data.feels_like}°C`;
+          document.getElementById('humidity').textContent = `${data.humidity}%`;
+          document.getElementById('wind').textContent = `${data.wind} km/h`;
+          document.getElementById('pressure').textContent = `${data.pressure} hPa`;
+        } catch (error) {
+          document.getElementById('condition').textContent = 'Unable to load weather';
+        }
+      }
+
+      window.onload = () => loadWeather();
+    </script>
+  </body>
+</html>
