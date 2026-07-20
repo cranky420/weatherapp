@@ -2,6 +2,7 @@ from pathlib import Path
 
 import httpx
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -11,8 +12,22 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# CORS Configuration
+app.add_middleware(
+    CORSMiddleware,
+    allow_origin_regex=r"http://(localhost|127\.0\.0\.1)(:\d+)?$",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 BASE_DIR = Path(__file__).resolve().parent
-app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
+
+app.mount(
+    "/static",
+    StaticFiles(directory=str(BASE_DIR / "static")),
+    name="static",
+)
 
 
 @app.get("/")
@@ -32,16 +47,25 @@ def weather(city: str = "Kolkata"):
     try:
         geocoding_response = httpx.get(
             "https://geocoding-api.open-meteo.com/v1/search",
-            params={"name": city, "count": 1, "language": "en", "format": "json"},
+            params={
+                "name": city,
+                "count": 1,
+                "language": "en",
+                "format": "json",
+            },
             timeout=10.0,
         )
         geocoding_response.raise_for_status()
         geocoding_data = geocoding_response.json()
 
         if not geocoding_data.get("results"):
-            return {"city": city, "error": "City not found"}
+            return {
+                "city": city,
+                "error": "City not found",
+            }
 
         location = geocoding_data["results"][0]
+
         lat = location["latitude"]
         lon = location["longitude"]
 
@@ -56,9 +80,11 @@ def weather(city: str = "Kolkata"):
             timeout=10.0,
         )
         forecast_response.raise_for_status()
+
         forecast_data = forecast_response.json()
 
         current = forecast_data.get("current", {})
+
         weather_code = int(current.get("weather_code", 0))
 
         return {
@@ -70,6 +96,7 @@ def weather(city: str = "Kolkata"):
             "wind": round(current.get("wind_speed_10m", 0)),
             "pressure": int(current.get("pressure_msl", 0)),
         }
+
     except httpx.HTTPError:
         return {
             "city": city,
@@ -99,4 +126,5 @@ def get_weather_condition(weather_code: int) -> str:
         82: "Violent rain showers",
         95: "Thunderstorm",
     }
+
     return mapping.get(weather_code, "Unknown")

@@ -1,0 +1,19 @@
+name: Weather App CI
+
+on:
+  push:
+    branches:
+      - feature/**
+      - develop
+      - main
+
+jobs:
+  hello-world:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Print Hello
+        run: echo "Hello from GitHub Actions!"
