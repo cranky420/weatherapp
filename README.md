@@ -1,6 +1,3 @@
-I can only see a placeholder README in the editor right now, not the full project tree, so I’m updating it as a complete weather app README template that matches a typical project of this type.
-
-```md
 # Weather App
 
 A responsive weather application for checking current conditions, searching cities, and viewing short-term and multi-day forecasts.
